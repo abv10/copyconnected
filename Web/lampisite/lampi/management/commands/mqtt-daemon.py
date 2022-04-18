@@ -44,7 +44,7 @@ class Command(BaseCommand):
     def _create_mqtt_client_and_loop_forever(self):
         self.client = Client()
         self.client.on_connect = self._on_connect
-        self.client.connect('localhost', port=50001)
+        self.client.connect('localhost', port=1883)
         self.client.loop_forever()
 
     def _monitor_for_new_devices(self, client, userdata, message):

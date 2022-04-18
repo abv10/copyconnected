@@ -18,6 +18,7 @@
 {% block content %}
     <script type="text/javascript">
         var window_global = {};
+        window_global['session_key'] = "{{ request.session.session_key }}";
         window_global['device_id'] = "{{ device.device_id }}";
         window_global['mqtt'] = {'hostname': window.location.hostname,
                                 'websockets_port': 50002};

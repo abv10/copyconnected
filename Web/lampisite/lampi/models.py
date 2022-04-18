@@ -44,7 +44,7 @@ class Lampi(models.Model):
             qos=2,
             retain=True,
             hostname="localhost",
-            port=50001,
+            port=1883,
             )
 
     def associate_and_publish_associated_msg(self,  user):
@@ -60,5 +60,5 @@ class Lampi(models.Model):
             qos=2,
             retain=True,
             hostname="localhost",
-            port=50001,
+            port=1883,
             )

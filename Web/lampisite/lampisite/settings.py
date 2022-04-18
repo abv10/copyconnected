@@ -95,6 +95,10 @@ CACHES = {
     }
 }
 
+# since we are caching the whole site, make the cache expiration short to
+#   limit possible inconsistencies
+CACHE_MIDDLEWARE_SECONDS = 5
+
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
 

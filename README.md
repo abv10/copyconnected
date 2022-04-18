@@ -32,4 +32,6 @@ This Git Repository will be updated each week/chapter with new assignments and w
 
 ## [Chapter 13: Introduction to PKI, SSL/TLS, and Certificates](Courseware/13.md)
 
+## [Chapter 14: Integrated Authentication and Access Control](Courseware/14.md)
+
 &copy; 2015-2022 LeanDog, Inc. and Nick Barendt

@@ -4,6 +4,13 @@
     name: ['libpq-dev', 'postgresql', 'postgresql-contrib']
     cache_valid_time: "{{ cache_update_valid_secs }}"
 
+- name: install dependencies for psycopg2
+  become: True
+  apt:
+    name: ['build-essential', 'python3-dev']
+    cache_valid_time: "{{ cache_update_valid_secs }}"
+
+
 - name: install Python psycopg2 library
   become: True
   pip:

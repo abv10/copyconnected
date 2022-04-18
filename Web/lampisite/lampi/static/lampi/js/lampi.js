@@ -1,6 +1,8 @@
 const hostAddress = window_global['mqtt']['hostname'];
 const hostPort = window_global['mqtt']['websockets_port'];
 const clientId = Math.random() + "_web_client";
+const username = window_global['device_id'];
+const password = window_global['session_key'];
 const deviceId = window_global['device_id'];
 
 function LampiPage($){
@@ -10,7 +12,9 @@ function LampiPage($){
     obj = {
         connect : function() {
           obj.client.connect({onSuccess: obj.onConnect,
-            onFailure: obj.onFailure});
+            onFailure: obj.onFailure,
+            useSSL:true,
+            userName: username, password: password });
         },
 
         onFailure : function(response) {
