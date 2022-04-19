@@ -28,8 +28,8 @@ We can use this to authenticate over websockets, without the need to pass the us
 
 The Django view and **lampi.js** files in the repository have been updated to pass:
 
-* 'device\_id' as the username
-* Djange 'session\_key' as the password
+* `device_id` as the username
+* Django `session_key` as the password
 
 We will be able to look this User object up within the Django auth infrastructure using the Session object's session\_id to perform **acl** or **auth** requests.
 

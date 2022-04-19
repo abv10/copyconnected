@@ -41,13 +41,13 @@ Sample Topics that you need to provide appropriate access control for:
 
 | Sample Topics |
 |--------------|
-| /devices/b827eb08451e/lamp/associated |
-| /devices/b827eb08451e/lamp/connection/lamp_service/state |
-| /devices/b827eb08451e/lamp/connection/lamp_ui/state |
-| /devices/b827eb08451e/lamp/connection/lamp\_bt\_peripheral/state |
-| /devices/b827eb08451e/lamp/changed |
-| /devices/b827eb08451e/lamp/set_config |
-| /devices/b827eb08451e/lamp/bluetooth |
+| devices/b827eb08451e/lamp/associated |
+| devices/b827eb08451e/lamp/connection/lamp_service/state |
+| devices/b827eb08451e/lamp/connection/lamp_ui/state |
+| devices/b827eb08451e/lamp/connection/lamp\_bt\_peripheral/state |
+| devices/b827eb08451e/lamp/changed |
+| devices/b827eb08451e/lamp/set_config |
+| devices/b827eb08451e/lamp/bluetooth |
 | $SYS/broker/connection/b827eb08451e_broker/state |
 
 (the device_id of 'b827eb08451e' is just for illustration purposes).
