@@ -1,8 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
 from uuid import uuid4
 import json
 import paho.mqtt.publish
+
 
 # Create your models here.
 DEFAULT_USER = 'parked_device_user'
@@ -41,6 +43,9 @@ class Lampi(models.Model):
         paho.mqtt.publish.single(
             self._generate_device_association_topic(),
             json.dumps(assoc_msg),
+            client_id=settings.MQTT_DAEMON_USERNAME,
+            auth={'username': settings.MQTT_DAEMON_USERNAME,
+                  'password': settings.MQTT_DAEMON_PASSWORD},
             qos=2,
             retain=True,
             hostname="localhost",
@@ -57,6 +62,9 @@ class Lampi(models.Model):
         paho.mqtt.publish.single(
             self._generate_device_association_topic(),
             json.dumps(assoc_msg),
+            client_id=settings.MQTT_DAEMON_USERNAME,
+            auth={'username': settings.MQTT_DAEMON_USERNAME,
+                  'password': settings.MQTT_DAEMON_PASSWORD},
             qos=2,
             retain=True,
             hostname="localhost",

@@ -151,3 +151,6 @@ try:
     from .mixpanel_settings import MIXPANEL_TOKEN
 except (ModuleNotFoundError, ImportError) as e:
     MIXPANEL_TOKEN = "UPDATE TOKEN IN mixpanel_settings.py"
+
+MQTT_DAEMON_USERNAME = "mqtt-daemon"
+MQTT_DAEMON_PASSWORD = "eecs397-iot"

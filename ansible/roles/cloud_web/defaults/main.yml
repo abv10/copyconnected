@@ -29,3 +29,7 @@ lampi_db_name: lampi
 lampi_db_user: lampiuser
 lampi_db_password: eecs397-iot
 
+# variables for chapter 14
+django_mqtt_daemon_username: mqtt-daemon
+django_mqtt_daemon_email: blah@blah.com
+django_mqtt_daemon_password: eecs397-iot

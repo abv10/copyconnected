@@ -42,7 +42,9 @@ class Command(BaseCommand):
         self.client.subscribe('devices/+/lamp/changed')
 
     def _create_mqtt_client_and_loop_forever(self):
-        self.client = Client()
+        self.client = Client(client_id=settings.MQTT_DAEMON_USERNAME)
+        self.client.username_pw_set(settings.MQTT_DAEMON_USERNAME,
+                                    settings.MQTT_DAEMON_PASSWORD)
         self.client.on_connect = self._on_connect
         self.client.connect('localhost', port=1883)
         self.client.loop_forever()

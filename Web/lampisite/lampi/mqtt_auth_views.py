@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate
 from django.contrib.sessions.models import Session
 from django.contrib.auth.models import User
 from paho.mqtt.client import topic_matches_sub
+from . import models
 
 
 ACL_READ = "1"
@@ -42,6 +43,56 @@ def get_user_from_session_key(session_key):
         return None
 
 
+DEVICE_BRIDGE_READ_TOPIC_LIST = [
+  "devices/{}/lamp/set_config",
+  "devices/{}/lamp/associated",
+]
+
+DEVICE_BRIDGE_WRITE_TOPIC_LIST = [
+  "$SYS/broker/connection/{}_broker/state",
+  "devices/{}/lamp/connection/lamp_service/state",
+  "devices/{}/lamp/connection/lamp_ui/state",
+  "devices/{}/lamp/connection/lamp_bt_peripheral/state",
+  "devices/{}/lamp/connection/bluetooth/state",
+  "devices/{}/lamp/changed",
+]
+
+
+def get_acls_for_bridge(device_id):
+    read_list, write_list = [], []
+    for t in DEVICE_BRIDGE_READ_TOPIC_LIST:
+        read_list.append(t.format(device_id))
+    for t in DEVICE_BRIDGE_WRITE_TOPIC_LIST:
+        write_list.append(t.format(device_id))
+    return read_list, write_list
+
+
+USER_READ_TOPIC_LIST = [
+  "$SYS/broker/connection/{}_broker/state",
+  "devices/{}/lamp/connection/lamp_service/state",
+  "devices/{}/lamp/connection/lamp_ui/state",
+  "devices/{}/lamp/connection/lamp_bt_peripheral/state",
+  "devices/{}/lamp/connection/bluetooth/state",
+  "devices/{}/lamp/changed",
+]
+
+USER_WRITE_TOPIC_LIST = [
+  "devices/{}/lamp/set_config",
+]
+
+
+def get_acls_for_user(user):
+    # a non-superuser should only have access to their devices
+    read_list, write_list = [], []
+    for lamp in user.lampi_set.all():
+        device_id = lamp.device_id
+        for t in USER_READ_TOPIC_LIST:
+            read_list.append(t.format(device_id))
+        for t in USER_WRITE_TOPIC_LIST:
+            write_list.append(t.format(device_id))
+    return read_list, write_list
+
+
 @csrf_exempt
 def auth(req):
     if req.method == 'POST':
@@ -56,8 +107,22 @@ def auth(req):
             #      mosquitto handles SSL/TLS auth directly, so this
             #      auth function never is invoked
             #
-            return HttpResponse(None, content_type='application/json')
+            # try Django username and password
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                return HttpResponse(None, content_type='application/json')
 
+            # try django websockets
+            #  username is device id
+            #  password is django session key of user that owns device
+            user = get_user_from_session_key(password)
+            if user:
+                try:
+                    device = models.Lampi.objects.get(device_id=username,
+                                                      user=user)
+                    return HttpResponse(None, content_type='application/json')
+                except models.Lampi.DoesNotExist:
+                    pass
     return HttpResponseForbidden(None, content_type='application/json')
 
 
@@ -77,6 +142,48 @@ def acl(req):
             #   django superusers
             #   websockets users
             #   LAMPI devices - broker bridges
-            return HttpResponse(None, content_type='application/json')
 
+            read_list, write_list = [], []
+
+            user = None
+
+            # try Django user
+            try:
+                user = User.objects.get(username=username)
+                # if Django superuser, grant access to anything
+                if user.is_superuser:
+                    return HttpResponse(None, content_type='application/json')
+            except User.DoesNotExist:
+                pass
+
+            if user is None:
+                # try websockets_user
+                try:
+                    device = models.Lampi.objects.get(device_id=username)
+                    user = device.user
+                except models.Lampi.DoesNotExist:
+                    pass
+
+            if user is not None:
+                read_list, write_list = get_acls_for_user(user)
+            else:
+                # try device_broker
+                if username == clientid and clientid.endswith('_broker'):
+                    device_id = clientid.split('_')[0]
+                    read_list, write_list = get_acls_for_bridge(device_id)
+
+            if acc in (ACL_READ, ACL_SUBSCRIBE) and read_list:
+                for t in read_list:
+                    print("ACL_READ: '{}' '{}'".format(t, topic))
+                    if topic_matches_sub(t, topic):
+                        print("  MATCH ACL_READ: '{}' '{}'".format(t, topic))
+                        return HttpResponse(None,
+                                            content_type='application/json')
+            elif acc == ACL_WRITE and write_list:
+                for t in write_list:
+                    print("ACL_WRITE: '{}' '{}'".format(t, topic))
+                    if topic_matches_sub(t, topic):
+                        print("  MATCH ACL_WRITE: '{}' '{}'".format(t, topic))
+                        return HttpResponse(None,
+                                            content_type='application/json')
     return HttpResponseForbidden(None, content_type='application/json')
